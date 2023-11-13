@@ -1,7 +1,7 @@
 import pandas as pd
 from data_extraction import EplDataDownload
 
-def get_multiple_seasons(output_path):
+def get_multiple_seasons(output_path:str):
     """"return dataframe with each team statistics from multiple premier league season
     Parameters:
     "otuput_path - path where excel file will be saved"""
@@ -16,8 +16,15 @@ def get_multiple_seasons(output_path):
             concat_df = concat_df.append(df)
         except:
             print(f"Couldnt connect to {season_url}")
-    concat_df.to_excel(output_path)
+    concat_df.to_excel(output_path, index=False)
 
 if __name__ == "__main__":
-    get_multiple_seasons()
-    print("Done")
+    while True:
+        user_input_path = input("Enter path where file will be saved in xlsx format: ")
+        if user_input_path.endswith(".xlsx"):
+            break
+        else:
+            print("Wrong file format, please enter a path with a '.xlsx' extension.")
+
+    get_multiple_seasons(user_input_path)
+    print(f"Done, file saved at {user_input_path}")

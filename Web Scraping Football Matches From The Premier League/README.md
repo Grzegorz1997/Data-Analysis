@@ -15,8 +15,6 @@ To run the web scraping code locally, follow these steps:
 1. Clone the repository to your local machine.
 
 2. Execute the web scraping script:
-
-    ```bash
-    python scrap_epl_data.py
-    ```
+    - scrap_epl_data.py
+     - enter the path in xlsx format where file will be saved
 
