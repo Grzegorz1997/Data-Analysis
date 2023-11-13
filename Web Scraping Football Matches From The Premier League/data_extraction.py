@@ -32,19 +32,27 @@ class EplDataDownload():
         shoot_link = links[0]
         shoot_data = requests.get(shoot_link)
         self.shoot_df = pd.read_html(shoot_data.text, match = "Shooting",header=1)[0]
-    
+        print(self.shoot_df.head())
+        
     def merge(self):
         self.merged_df = self.stats_df.merge(self.shoot_df[['Date','Sh', 'SoT','Dist', 'FK','PK', 'PKatt']], on="Date",how="inner")
-        
+        return self.merged_df
+    
     def loop_each_team(self):
-        concat_df = pd.DataFrame()
+        self.concat_df = pd.DataFrame()
         team_links = self.get_stats_links()
-        for team in team_links:
+        for team in team_links:  
             self.get_stats_table(team_links.index(team))
             self.get_shooting_table()
             df = self.merge()
-            self.concat_df = concat_df.append(df)
-
+            df["team_name"] = team.split("/")[-1].split("-Stats")[0].replace("-"," ")
+            start_year = (pd.to_datetime(df["Date"]).dt.year).min()
+            end_year = (pd.to_datetime(df["Date"]).dt.year).max()
+            df["season"] = f"{start_year}-{end_year}"
+            self.concat_df = self.concat_df.append(df)
+            print(self.concat_df.shape[0])
+        print(self.concat_df.shape[0])
+    
     def scrap_epl_data(self):
         self.loop_each_team()
         return self.concat_df
