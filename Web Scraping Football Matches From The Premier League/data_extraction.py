@@ -84,10 +84,3 @@ class EplDataDownload():
     def scrap_epl_data(self):
         self.loop_each_team()
         return self.concat_df
-    
-if __name__ == "__main__":
-    
-    c1 = EplDataDownload("https://fbref.com/en/comps/9/2022-2023/2022-2023-Premier-League-Stats#all_league_structure")
-    df = c1.scrap_epl_data()
-    print(df.head())
-    df.to_excel(r"C:\Python Scripts\Data Analysis\Web Scraping Football Matches From The Premier League\test.xlsx")
