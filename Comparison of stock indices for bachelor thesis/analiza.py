@@ -1,8 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np 
-import calendar
+import os
+
+BASE_DIR = os.path.dirname(__file__)
 
 TRANSLATE_MONTH = {"January":"Styczeń",
                   "February":"Luty",
@@ -23,9 +24,9 @@ def prepare_data():
         the numeric columns to float format.
         Merges dataframes.
         """
-    wig20_df = pd.read_csv(r"C:\Python Scripts\Learning\Licencjat\Dane\Dane historyczne dla WIG20.csv", delimiter=',')
-    dax_df = pd.read_csv(r"C:\Python Scripts\Learning\Licencjat\Dane\Dane historyczne dla DAX.csv", delimiter=',')
-    nasdaq_df = pd.read_csv(r"C:\Python Scripts\Learning\Licencjat\Dane\Dane historyczne dla NASDAQ Composite.csv", delimiter=',')
+    wig20_df = pd.read_csv(rf"{BASE_DIR}\Dane\Dane historyczne dla WIG20.csv", delimiter=',')
+    dax_df = pd.read_csv(rf"{BASE_DIR}\Dane\Dane historyczne dla DAX.csv", delimiter=',')
+    nasdaq_df = pd.read_csv(rf"{BASE_DIR}\Dane\Dane historyczne dla NASDAQ Composite.csv", delimiter=',')
     
     wig20_df['Data'] = pd.to_datetime(wig20_df['Data'], format='%d.%m.%Y')
     dax_df['Data'] = pd.to_datetime(dax_df['Data'], format='%d.%m.%Y')
@@ -48,7 +49,6 @@ def covid_analysis(df):
     last_day = "2020-04-30"
 
     merged_df = df[(df['Data']>=first_day) & (df['Data']<= last_day)]
-    merged_df.to_excel(r"C:\Python Scripts\Learning\Licencjat\Dane\covid_dane.xlsx")
 
     fig, ax1 = plt.subplots(figsize=(10, 6))
     wig20, = ax1.plot(merged_df['Data'], merged_df['WIG20'], label='WIG20', color='blue')
@@ -298,10 +298,6 @@ def bank_crysis_analysis(df):
     ax.set_title('Tygodniowe zmiany procentowe',y=0.92)
     
     plt.show()
-
-    print(correlation_matrix)
-    print(monthly_changes)
-    print(weekly_changes)
 
 if __name__ == "__main__":
     final_df = prepare_data()
