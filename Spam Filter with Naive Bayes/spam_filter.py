@@ -8,10 +8,9 @@ DATA_FILE_PATH = rf"{BASE_DIR}\Data\SMSSpamCollection.csv"
 
 class BayesSpamFilter():
     def __init__(self, file_path:str):
-        self.path = file_path
-        self.df = pd.read_csv("Data\SMSSpamCollection.csv",sep='\t',header=None,names=['Label', 'SMS'])
-        self.output_path = input("Please enter output path in xlsx format")
-        
+        self.file_path = file_path
+        self.df = pd.read_csv(self.file_path,sep='\t',header=None,names=['Label', 'SMS'])
+
     def divide_dataframe(self):
         self.df["Label"].replace("ham","non-spam",inplace=True)
         randomized_df = self.df.sample(frac=1,random_state=1)
@@ -51,25 +50,26 @@ class BayesSpamFilter():
             parameters[word] = word_probability
         return parameters,probability
 
+    def return_parameters_probabilites(self):
+        self.spam_parameters,self.spam_probability = self.create_parameters_dict("spam")
+        self.no_spam_parameters,self.no_spam_probability = self.create_parameters_dict("non-spam")
+        
+    def new_message_classification(self,message):
 
-
-    def new_message_classification(self,message:str):
-        spam_parameters,spam_probability = self.create_parameters_dict("spam")
-        no_spam_parameters,no_spam_probability = self.create_parameters_dict("non-spam")
         message = re.sub('\W', ' ', message)
         message = message.lower()
         message = message.split()
-        
-        p_spam_given_message = spam_probability
-        p_no_spam_given_message = no_spam_probability
+
+        p_spam_given_message = self.spam_probability
+        p_no_spam_given_message = self.no_spam_probability
 
         for word in message:
-            if word in spam_parameters:
-                p_spam_given_message *= spam_parameters[word]
+            if word in self.spam_parameters:
+                p_spam_given_message *= self.spam_parameters[word]
             else:
                 pass
-            if word in no_spam_parameters:
-                p_no_spam_given_message *= no_spam_parameters[word]
+            if word in self.no_spam_parameters:
+                p_no_spam_given_message *= self.no_spam_parameters[word]
             else:
                 pass
         if p_no_spam_given_message > p_spam_given_message:
@@ -78,7 +78,7 @@ class BayesSpamFilter():
             return "spam"
         else:
             return "human assistance"
-    
+        
     def perform_spam_filter(self):
         self.test_df['Naive Bayes prediction'] = self.test_df['SMS'].apply(self.new_message_classification)
         self.test_df["Verification"] = np.where(self.test_df["Label"] == self.test_df["Naive Bayes prediction"],1,0)
@@ -87,11 +87,17 @@ class BayesSpamFilter():
     def main(self):
         self.divide_dataframe()
         self.create_vocabulary()
-        self.create_parameters_dict()
+        self.return_parameters_probabilites()
         self.perform_spam_filter()
+        self.test_df.to_clipboard()
         print(f"Naive Bayes accuracy for tested dataset is equal to: {str(round(self.bayes_accuracy* 100,2))} %")
-        self.test_df.to_excel(self.output_path)
-        
+
 if __name__ == "__main__":
-    BayesSpamFilter().main()
+    print("Start")
+    BayesSpamFilter(file_path = DATA_FILE_PATH).main()
     print("Done")
+    
+# TODO 
+# verify function names
+# add comments
+# add readme
