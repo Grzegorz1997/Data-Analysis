@@ -43,20 +43,27 @@ def prepare_data():
 
     return merged_df
     
+def create_correlation_matrix(df):
+    correlation_matrix = df[['WIG20', 'DAX', 'NASDAQ']].corr()
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', square=True)
+    plt.title('Macierz korelacji indeksów giełdowych')
+    plt.show()
+    
 def covid_analysis(df):
     """Filter merged dataframe by analysed period"""
     first_day = "2020-01-01"
     last_day = "2020-04-30"
 
-    merged_df = df[(df['Data']>=first_day) & (df['Data']<= last_day)]
+    filtered_df = df[(df['Data']>=first_day) & (df['Data']<= last_day)]
 
     fig, ax1 = plt.subplots(figsize=(10, 6))
-    wig20, = ax1.plot(merged_df['Data'], merged_df['WIG20'], label='WIG20', color='blue')
+    wig20, = ax1.plot(filtered_df['Data'], filtered_df['WIG20'], label='WIG20', color='blue')
     ax1.set_xlabel('Data')
     ax1.set_ylabel('WIG20 cena zamknięcia', color='black')
     ax2 = ax1.twinx()
-    dax, = ax2.plot(merged_df['Data'], merged_df['DAX'], label='DAX', color='red')
-    NASDAQ, = ax2.plot(merged_df['Data'], merged_df['NASDAQ'], label='NASDAQ', color='green')
+    dax, = ax2.plot(filtered_df['Data'], filtered_df['DAX'], label='DAX', color='red')
+    NASDAQ, = ax2.plot(filtered_df['Data'], filtered_df['NASDAQ'], label='NASDAQ', color='green')
     ax2.set_ylabel('DAX & NASDAQ cena zamknięcia', color='black')
     lines = [wig20, dax, NASDAQ]
     labels = [line.get_label() for line in lines]
@@ -64,16 +71,17 @@ def covid_analysis(df):
     plt.title('Porównanie Cen Indeksów Giełdowych')
     plt.show()
 
-    correlation_matrix = merged_df[['WIG20', 'DAX', 'NASDAQ']].corr()
+    # correlation_matrix = merged_df[['WIG20', 'DAX', 'NASDAQ']].corr()
 
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', square=True)
-    plt.title('Macierz korelacji indeksów giełdowych')
-    plt.show()
+    # plt.figure(figsize=(8, 6))
+    # sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', square=True)
+    # plt.title('Macierz korelacji indeksów giełdowych')
+    # plt.show()
+    create_correlation_matrix(filtered_df)
+    
+    filtered_df.set_index('Data', inplace=True)
 
-    merged_df.set_index('Data', inplace=True)
-
-    monthly_df = merged_df.resample('M').last()
+    monthly_df = filtered_df.resample('M').last()
     monthly_changes = monthly_df.pct_change()
     monthly_changes.dropna(how = "all", inplace=True)
     monthly_changes['Miesiąc'] = monthly_changes.index.strftime('%B %Y')
@@ -98,8 +106,8 @@ def covid_analysis(df):
     plt.show()
     
 
-    merged_df.reset_index(inplace=True)
-    weekly_changes = merged_df.set_index('Data').resample('W').mean().pct_change()
+    filtered_df.reset_index(inplace=True)
+    weekly_changes = filtered_df.set_index('Data').resample('W').mean().pct_change()
     weekly_changes.dropna(how = 'all',inplace=True)
     weekly_changes['Numer Tygodnia'] = weekly_changes.index.week
     weekly_changes['Numer Tygodnia'] = weekly_changes['Numer Tygodnia'].map(lambda x: f'Tydzień {x}')
@@ -121,10 +129,6 @@ def covid_analysis(df):
     table.scale(1, 1.5)
     ax.set_title('Tygodniowe zmiany procentowe',y=0.8)
     plt.show()
-
-    print(correlation_matrix)
-    print(monthly_changes)
-    print(weekly_changes)
     
 def ru_ua_analysis(df):
     first_day = "2022-01-01"
@@ -208,12 +212,6 @@ def ru_ua_analysis(df):
     table.scale(1.2, 1.2)
     ax.set_title('Tygodniowe zmiany procentowe',y=0.74)
     plt.show()
-
-
-
-    print(correlation_matrix)
-    print(monthly_changes)
-    print(weekly_changes)
     
 def bank_crysis_analysis(df):
     first_day = "2008-06-01"
@@ -296,7 +294,6 @@ def bank_crysis_analysis(df):
     table.set_fontsize(10)
     table.scale(1.2, 1.2)
     ax.set_title('Tygodniowe zmiany procentowe',y=0.92)
-    
     plt.show()
 
 if __name__ == "__main__":
