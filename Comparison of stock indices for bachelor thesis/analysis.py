@@ -18,27 +18,27 @@ TRANSLATE_MONTH = {"January":"Styczeń",
                   "November":"Listopad",
                   "December":"Grudzień"}
 
-def prepare_data():
-    """"Load the data from CSV files into pandas dataframes.
+def clean_data(path):
+    """  Load the data from CSV files into pandas dataframes.
         Converts the date column to datetime format and
-        the numeric columns to float format.
-        Merges dataframes.
-        """
-    wig20_df = pd.read_csv(rf"{BASE_DIR}\Dane\Dane historyczne dla WIG20.csv", delimiter=',')
-    dax_df = pd.read_csv(rf"{BASE_DIR}\Dane\Dane historyczne dla DAX.csv", delimiter=',')
-    nasdaq_df = pd.read_csv(rf"{BASE_DIR}\Dane\Dane historyczne dla NASDAQ Composite.csv", delimiter=',')
-    
-    wig20_df['Data'] = pd.to_datetime(wig20_df['Data'], format='%d.%m.%Y')
-    dax_df['Data'] = pd.to_datetime(dax_df['Data'], format='%d.%m.%Y')
-    nasdaq_df['Data'] = pd.to_datetime(nasdaq_df['Data'], format='%d.%m.%Y')
+        the numeric columns to float format."""
+        
+    df = pd.read_csv(path, delimiter=',')
+    df['Data'] = pd.to_datetime(df['Data'], format='%d.%m.%Y')
+    df['Ostatnio'] = df['Ostatnio'].str.replace(".","").str.replace(",",".").astype(float)
+    return df
 
-    wig20_df['Ostatnio'] = wig20_df['Ostatnio'].str.replace(".","").str.replace(",",".").astype(float)
-    dax_df['Ostatnio'] = dax_df['Ostatnio'].str.replace(".","").str.replace(",",".").astype(float)
-    nasdaq_df['Ostatnio'] = nasdaq_df['Ostatnio'].str.replace(".","").str.replace(",",".").astype(float)
+def prepare_data():
+    """merges dataframes"""
+    wig20_df = clean_data(rf"{BASE_DIR}\Dane\Dane historyczne dla WIG20.csv")
+    dax_df = clean_data(rf"{BASE_DIR}\Dane\Dane historyczne dla DAX.csv")
+    nasdaq_df = clean_data(rf"{BASE_DIR}\Dane\Dane historyczne dla NASDAQ Composite.csv")
 
-    merged_df = pd.merge(wig20_df[['Data', 'Ostatnio']], dax_df[['Data', 'Ostatnio']], left_on='Data', right_on='Data', suffixes=('_WIG20', '_DAX'))
-    merged_df = pd.merge(merged_df, nasdaq_df[['Data', 'Ostatnio']], left_on='Data', right_on='Data')
-
+    merged_df = (
+        wig20_df[['Data', 'Ostatnio']]
+        .merge(dax_df[['Data', 'Ostatnio']], on='Data')
+        .merge(nasdaq_df[['Data', 'Ostatnio']], on='Data')
+)
     merged_df.columns = ['Data', 'WIG20', 'DAX', 'NASDAQ']
 
     return merged_df
