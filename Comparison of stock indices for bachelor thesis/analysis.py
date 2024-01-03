@@ -50,6 +50,57 @@ def create_correlation_matrix(df):
     plt.title('Macierz korelacji indeksów giełdowych')
     plt.show()
     
+def create_monthly_changes_plot(df):
+    
+    data_df = df.set_index('Data')
+    monthly_df = data_df.resample('M').last()
+    monthly_changes = monthly_df.pct_change()
+    monthly_changes.dropna(how = "all", inplace=True)
+    monthly_changes['Miesiąc'] = monthly_changes.index.strftime('%B %Y')
+    monthly_changes['Miesiąc'] = monthly_changes['Miesiąc'].apply(lambda x: x.split()[0]).map(TRANSLATE_MONTH) + " " + monthly_changes.index.year.astype(str)
+    monthly_changes.reset_index(inplace=True)
+    monthly_changes = monthly_changes[['Miesiąc', 'WIG20', 'DAX', 'NASDAQ']]
+
+    fig, ax = plt.subplots(figsize=(6, 10))
+    ax.axis('off')
+    table_data = monthly_changes.applymap(lambda x: f'{x:.2%}' if not isinstance(x, str) else x)
+    col_labels = table_data.columns.tolist()
+
+    table = ax.table(cellText=table_data.values,
+                    colLabels=col_labels,
+                    cellLoc='center',
+                    loc='center')
+
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.5)
+    ax.set_title('Miesięczne zmiany procentowe',y=0.57)
+    plt.show()
+    
+def create_weekly_changes_plot(df):
+    weekly_changes = df.set_index('Data').resample('W').mean().pct_change()
+    weekly_changes.dropna(how = 'all',inplace=True)
+    weekly_changes['Numer Tygodnia'] = weekly_changes.index.week
+    weekly_changes['Numer Tygodnia'] = weekly_changes['Numer Tygodnia'].map(lambda x: f'Tydzień {x}')
+    weekly_changes = weekly_changes[['Numer Tygodnia', 'WIG20', 'DAX', 'NASDAQ']]
+
+    fig, ax = plt.subplots(figsize=(6, 10))
+    ax.axis('off')
+
+    table_data = weekly_changes.applymap(lambda x: f'{x:.2%}' if not isinstance(x, str) else x)
+    col_labels = table_data.columns.tolist()
+
+    table = ax.table(cellText=table_data.values,
+                    colLabels=col_labels,
+                    cellLoc='center',
+                    loc='center')
+
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.5)
+    ax.set_title('Tygodniowe zmiany procentowe',y=0.8)
+    plt.show()
+    
 def covid_analysis(df):
     """Filter merged dataframe by analysed period"""
     first_day = "2020-01-01"
@@ -79,57 +130,58 @@ def covid_analysis(df):
     # plt.show()
     create_correlation_matrix(filtered_df)
     
-    filtered_df.set_index('Data', inplace=True)
+    # filtered_df.set_index('Data', inplace=True)
 
-    monthly_df = filtered_df.resample('M').last()
-    monthly_changes = monthly_df.pct_change()
-    monthly_changes.dropna(how = "all", inplace=True)
-    monthly_changes['Miesiąc'] = monthly_changes.index.strftime('%B %Y')
-    monthly_changes['Miesiąc'] = monthly_changes['Miesiąc'].apply(lambda x: x.split()[0]).map(TRANSLATE_MONTH) + " " + monthly_changes.index.year.astype(str)
-    monthly_changes.reset_index(inplace=True)
-    monthly_changes = monthly_changes[['Miesiąc', 'WIG20', 'DAX', 'NASDAQ']]
+    # monthly_df = filtered_df.resample('M').last()
+    # monthly_changes = monthly_df.pct_change()
+    # monthly_changes.dropna(how = "all", inplace=True)
+    # monthly_changes['Miesiąc'] = monthly_changes.index.strftime('%B %Y')
+    # monthly_changes['Miesiąc'] = monthly_changes['Miesiąc'].apply(lambda x: x.split()[0]).map(TRANSLATE_MONTH) + " " + monthly_changes.index.year.astype(str)
+    # monthly_changes.reset_index(inplace=True)
+    # monthly_changes = monthly_changes[['Miesiąc', 'WIG20', 'DAX', 'NASDAQ']]
 
-    fig, ax = plt.subplots(figsize=(6, 10))
-    ax.axis('off')
-    table_data = monthly_changes.applymap(lambda x: f'{x:.2%}' if not isinstance(x, str) else x)
-    col_labels = table_data.columns.tolist()
+    # fig, ax = plt.subplots(figsize=(6, 10))
+    # ax.axis('off')
+    # table_data = monthly_changes.applymap(lambda x: f'{x:.2%}' if not isinstance(x, str) else x)
+    # col_labels = table_data.columns.tolist()
 
-    table = ax.table(cellText=table_data.values,
-                    colLabels=col_labels,
-                    cellLoc='center',
-                    loc='center')
+    # table = ax.table(cellText=table_data.values,
+    #                 colLabels=col_labels,
+    #                 cellLoc='center',
+    #                 loc='center')
 
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1, 1.5)
-    ax.set_title('Miesięczne zmiany procentowe',y=0.57)
-    plt.show()
+    # table.auto_set_font_size(False)
+    # table.set_fontsize(10)
+    # table.scale(1, 1.5)
+    # ax.set_title('Miesięczne zmiany procentowe',y=0.57)
+    # plt.show()
     
 
-    filtered_df.reset_index(inplace=True)
-    weekly_changes = filtered_df.set_index('Data').resample('W').mean().pct_change()
-    weekly_changes.dropna(how = 'all',inplace=True)
-    weekly_changes['Numer Tygodnia'] = weekly_changes.index.week
-    weekly_changes['Numer Tygodnia'] = weekly_changes['Numer Tygodnia'].map(lambda x: f'Tydzień {x}')
-    weekly_changes = weekly_changes[['Numer Tygodnia', 'WIG20', 'DAX', 'NASDAQ']]
+    # filtered_df.reset_index(inplace=True)
+    create_monthly_changes_plot(filtered_df)
+    # weekly_changes = filtered_df.set_index('Data').resample('W').mean().pct_change()
+    # weekly_changes.dropna(how = 'all',inplace=True)
+    # weekly_changes['Numer Tygodnia'] = weekly_changes.index.week
+    # weekly_changes['Numer Tygodnia'] = weekly_changes['Numer Tygodnia'].map(lambda x: f'Tydzień {x}')
+    # weekly_changes = weekly_changes[['Numer Tygodnia', 'WIG20', 'DAX', 'NASDAQ']]
 
-    fig, ax = plt.subplots(figsize=(6, 10))
-    ax.axis('off')
+    # fig, ax = plt.subplots(figsize=(6, 10))
+    # ax.axis('off')
 
-    table_data = weekly_changes.applymap(lambda x: f'{x:.2%}' if not isinstance(x, str) else x)
-    col_labels = table_data.columns.tolist()
+    # table_data = weekly_changes.applymap(lambda x: f'{x:.2%}' if not isinstance(x, str) else x)
+    # col_labels = table_data.columns.tolist()
 
-    table = ax.table(cellText=table_data.values,
-                    colLabels=col_labels,
-                    cellLoc='center',
-                    loc='center')
+    # table = ax.table(cellText=table_data.values,
+    #                 colLabels=col_labels,
+    #                 cellLoc='center',
+    #                 loc='center')
 
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1, 1.5)
-    ax.set_title('Tygodniowe zmiany procentowe',y=0.8)
-    plt.show()
-    
+    # table.auto_set_font_size(False)
+    # table.set_fontsize(10)
+    # table.scale(1, 1.5)
+    # ax.set_title('Tygodniowe zmiany procentowe',y=0.8)
+    # plt.show()
+    create_weekly_changes_plot(filtered_df)
 def ru_ua_analysis(df):
     first_day = "2022-01-01"
     last_day = "2022-04-30"
