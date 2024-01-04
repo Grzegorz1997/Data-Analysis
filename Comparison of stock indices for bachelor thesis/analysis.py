@@ -203,9 +203,10 @@ def bank_crysis_analysis(df):
     create_monthly_changes_plot(filtered_df)
     create_weekly_changes_plot(filtered_df)
 
-if __name__ == "__main__":
+def main():
     final_df = prepare_data()
     covid_analysis(final_df)
     ru_ua_analysis(final_df)
     bank_crysis_analysis(final_df)
-    print("DONE")
+
+main()
