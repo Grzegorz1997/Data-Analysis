@@ -19,17 +19,22 @@ TRANSLATE_MONTH = {"January":"Styczeń",
                   "December":"Grudzień"}
 
 def clean_data(path):
-    """  Load the data from CSV files into pandas dataframes.
-        Converts the date column to datetime format and
-        the numeric columns to float format."""
-        
+    """
+    Loads the data from a CSV file into a pandas dataframe. Converts the 'Data' column to datetime format and the 'Ostatnio' column to float format.
+    Parameters:
+    - path: The path to the CSV file.
+        """
     df = pd.read_csv(path, delimiter=',')
     df['Data'] = pd.to_datetime(df['Data'], format='%d.%m.%Y')
     df['Ostatnio'] = df['Ostatnio'].str.replace(".","").str.replace(",",".").astype(float)
     return df
 
 def prepare_data():
-    """merges dataframes"""
+    """
+    Merges dataframes for WIG20, DAX, and NASDAQ indices, selecting only the 'Data' and 'Ostatnio' columns. 
+    Renames columns and returns the merged dataframe.
+    Returns merged dataframe containing data for WIG20, DAX, and NASDAQ indices.
+    """
     wig20_df = clean_data(rf"{BASE_DIR}\Dane\Dane historyczne dla WIG20.csv")
     dax_df = clean_data(rf"{BASE_DIR}\Dane\Dane historyczne dla DAX.csv")
     nasdaq_df = clean_data(rf"{BASE_DIR}\Dane\Dane historyczne dla NASDAQ Composite.csv")
@@ -42,6 +47,11 @@ def prepare_data():
     return merged_df
     
 def create_correlation_matrix(df):
+    """ 
+    Creates and displays a heatmap of the correlation matrix for WIG20, DAX, and NASDAQ indices.
+    Parameters:
+    - df: Dataframe containing data for WIG20, DAX, and NASDAQ indices.
+    """
     correlation_matrix = df[['WIG20', 'DAX', 'NASDAQ']].corr()
     plt.figure(figsize=(8, 6))
     sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', square=True)
@@ -49,6 +59,11 @@ def create_correlation_matrix(df):
     plt.show()
     
 def create_monthly_changes_plot(df):
+    """ 
+    Creates and displays a table showing the monthly percentage changes for WIG20, DAX, and NASDAQ indices.
+    Parameters:
+    - df: Dataframe containing data for WIG20, DAX, and NASDAQ indices.
+    """
     data_df = df.set_index('Data')
     monthly_df = data_df.resample('M').last()
     monthly_changes = monthly_df.pct_change()
@@ -75,6 +90,11 @@ def create_monthly_changes_plot(df):
     plt.show()
     
 def create_weekly_changes_plot(df):
+    """ 
+    Creates and displays a table showing the weekly percentage changes for WIG20, DAX, and NASDAQ indices.
+    Parameters:
+    - df: Dataframe containing data for WIG20, DAX, and NASDAQ indices.
+    """
     weekly_changes = df.set_index('Data').resample('W').mean().pct_change()
     weekly_changes.dropna(how = 'all',inplace=True)
     weekly_changes['Numer Tygodnia'] = weekly_changes.index.week
@@ -99,7 +119,12 @@ def create_weekly_changes_plot(df):
     plt.show()
     
 def covid_analysis(df):
-    """Filter merged dataframe by analysed period"""
+    """ 
+    Analyzes the performance of WIG20, DAX, and NASDAQ indices during the COVID-19 selected period. 
+    Plots the closing prices and generates correlation matrices, monthly, and weekly percentage change tables.
+    Parameters:
+    - df: Dataframe containing data for WIG20, DAX, and NASDAQ indices.
+    """
     first_day = "2020-01-01"
     last_day = "2020-04-30"
     filtered_df = df[(df['Data']>=first_day) & (df['Data']<= last_day)]
@@ -121,6 +146,12 @@ def covid_analysis(df):
     create_weekly_changes_plot(filtered_df)
     
 def ru_ua_analysis(df):
+    """ 
+    Analyzes the performance of WIG20, DAX, and NASDAQ indices during a specified period of Russian invasion on Ukraine.
+    Plots the closing prices and generates correlation matrices, monthly, and weekly percentage change tables.
+    Parameters:
+    - df: Dataframe containing data for WIG20, DAX, and NASDAQ indices.
+    """
     first_day = "2022-01-01"
     last_day = "2022-04-30"
     filtered_df = df[(df['Data']>=first_day) & (df['Data']<= last_day)]
@@ -147,6 +178,10 @@ def ru_ua_analysis(df):
     create_weekly_changes_plot(filtered_df)
     
 def bank_crysis_analysis(df):
+    """ 
+    Analyzes the performance of WIG20, DAX, and NASDAQ indices during the selected period of 2008 financial crisis.
+    Plots the closing prices and generates correlation matrices, monthly, and weekly percentage change tables.
+    """
     first_day = "2008-06-01"
     last_day = "2008-12-31"
     filtered_df = df[(df['Data']>=first_day) & (df['Data']<= last_day)]
