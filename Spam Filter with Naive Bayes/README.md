@@ -16,10 +16,13 @@
 2. **Clone the Repository:**
    - Clone or download this repository to your local machine.
 
-3. **Run the Script:**
+3. **Navigate to the Script Directory:**
+   - Open a terminal or command prompt and navigate to the directory containing the script (`naive_bayes_spam_filter.py`).
+
+4. **Run the Script:**
    - Execute the following command to run the script:
      ```bash
-    python naive_bayes_spam_filter.py
+     python naive_bayes_spam_filter.py
      ```
 
 **Note:** Adjust the file paths and names according to your setup. Ensure that the dataset file (`SMSSpamCollection.csv`) is in the same directory as the script.
