@@ -18,8 +18,7 @@
 
 3. **Run the Script:**
    - Execute the following command to run the script:
-     ```
-    write in terminal cd "folder location where script is"
+     ```bash
     python naive_bayes_spam_filter.py
      ```
 
