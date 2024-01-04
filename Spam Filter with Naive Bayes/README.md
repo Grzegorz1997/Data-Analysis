@@ -1,4 +1,6 @@
 ## Project Description:
+
+# In this project, I'm creating a spam filter for SMS messages using the multinomial Naive Bayes algorithm. Aim is to achieve over 80% accuracy in classifying new messages as spam or non-spam. I will train the algorithm on a dataset of 5,572 SMS messages already labeled by humans, available from the UCI Machine Learning Repository by Tiago A. Almeida and José María Gómez Hidalgo. Success will be determined by the filter's ability to accurately categorize incoming messages.
 # - This script implements a Naive Bayes spam filter for classifying SMS messages as 'spam' or 'non-spam'.
 # - It uses Laplace smoothing for probability calculations and trains on a provided dataset.
 # - The accuracy of the Naive Bayes classifier is printed at the end of the execution.
